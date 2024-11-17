@@ -1,11 +1,11 @@
 import express from "express"
 
-import userRepository from "../../adapters/repository/userRepository"
 import userUseCase from "../../useCases/userUseCase"
 import UserController from "../../adapters/controllers/userController"
 import hashingService from "../utils/hashingService"
 import jwtService from "../utils/jwtService"
 import User from "../model/userModel"
+import userRepository from "../../adapters/respository/userRepository"
 // import userAuth from "../middlewares/userAuth"
 
 

@@ -2,34 +2,29 @@ import { Model } from "mongoose";
 import IUser from "../../interfaces/IUser";
 import IUserRepository from "../../interfaces/IUserRepository";
 
-
-class userRepository implements IUserRepository {
-  private user: Model<IUser>
+class UserRepository implements IUserRepository {
+  private user: Model<IUser>;
 
   constructor(user: Model<IUser>) {
-    this.user = user
+    this.user = user;
   }
 
-  async checkUserExists(email: string) {
-    return await this.user.findOne({ email: email })
+  async checkUserExists(email: string): Promise<IUser | null> {
+    return this.user.findOne({ email });
   }
 
-  async createUser(name: string, email: string, password: string) {
-    const user = await new this.user({
-      name: name,
-      email: email,
-      password: password
-    })
-    return await user.save()
+  async createUser(name: string, email: string, password: string): Promise<IUser | null> {
+    const newUser = new this.user({ name, email, password });
+    return newUser.save();
   }
 
-  async checkUser(userId:string){
-    return this.user.findOne({_id:userId})
+  async checkUser(userId: string): Promise<IUser | null> {
+    return this.user.findById(userId);
   }
 
-  async getAllUser(){
-    return this.user.find()
+  async getAllUsers(): Promise<IUser[]> {
+    return this.user.find();
   }
 }
 
-export default userRepository
+export default UserRepository;

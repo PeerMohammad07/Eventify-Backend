@@ -1,91 +1,74 @@
-import IHashingService from "../interfaces/IHashingService"
-import IjwtService from "../interfaces/IJwtService"
-import IUser from "../interfaces/IUser"
-import IUserRepository from "../interfaces/IUserRepository"
-import IUserUseCase from "../interfaces/IUserUseCase"
+import { HttpStatusEnum } from "../enums/statusCodeEnum";
+import CustomError from "../infrastructure/utils/customError";
+import IHashingService from "../interfaces/IHashingService";
+import IjwtService from "../interfaces/IJwtService";
+import IUserRepository from "../interfaces/IUserRepository";
+import IUserUseCase from "../interfaces/IUserUseCase";
 
-
-
-export default class userUseCase implements IUserUseCase {
-  private userRepository: IUserRepository
-  private hashingService: IHashingService
-  private jwtService: IjwtService
+export default class UserUseCase implements IUserUseCase {
+  private userRepository: IUserRepository;
+  private hashingService: IHashingService;
+  private jwtService: IjwtService;
 
   constructor(userRepository: IUserRepository, hashingService: IHashingService, jwtService: IjwtService) {
-    this.userRepository = userRepository
-    this.hashingService = hashingService
-    this.jwtService = jwtService
+    this.userRepository = userRepository;
+    this.hashingService = hashingService;
+    this.jwtService = jwtService;
   }
 
-  async register(data: IUser) {
-    const userExists = await this.userRepository.checkUserExists(data.email)
+  async register(data: { name: string; email: string; password: string }) {
+    const userExists = await this.userRepository.checkUserExists(data.email);
     if (userExists) {
-      return {
-        status: false,
-        message: {
-          email: "User already exists with this email"
-        }
-      }
+      throw new CustomError(HttpStatusEnum.CONFLICT, "User already exists with this email");
     }
 
-    if (data.password) {
-      data.password = await this.hashingService.hashing(data.password)
+    // Hash password
+    data.password = await this.hashingService.hashing(data.password);
+
+    // Create user in the database
+    const user = await this.userRepository.createUser(data.name, data.email, data.password);
+    if (!user) {
+      throw new CustomError(HttpStatusEnum.INTERNAL_SERVER_ERROR, "Failed to create user.");
     }
 
-    const user: any = await this.userRepository.createUser(data.name, data.email, data.password)
-    if (user) {
-      return {
-        status: true,
-        message: "User created successfully",
-        data: {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          isAdmin: user.isAdmin
-        }
-      }
-    }
-
-    const payload = { id: user._id, name: user.name, isAdmin: user.isAdmin }
-    const token = this.jwtService.generateToken(payload)
-    const refreshToken = this.jwtService.generateRefreshToken(payload)
+    // Generate tokens
+    const payload = { id: user._id, name: user.name };
+    const token = this.jwtService.generateToken(payload);
+    const refreshToken = this.jwtService.generateRefreshToken(payload);
 
     return {
-      status: false,
-      data: { token, refreshToken, user },
-      message: "Failed to register",
-    }
+      status: true,
+      message: "User created successfully",
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        token,
+        refreshToken,
+      },
+    };
   }
 
   async login(email: string, password: string) {
-    const user = await this.userRepository.checkUserExists(email)
+    const user = await this.userRepository.checkUserExists(email);
+
     if (!user) {
-      return {
-        status: false,
-        message: {
-          email: "User Not Found"
-        }
-      }
+      throw new CustomError(HttpStatusEnum.NOT_FOUND, "User Not Found");
     }
 
-    const status = await this.hashingService.compare(password, user.password)
+    const status = await this.hashingService.compare(password, user.password);
     if (!status) {
-      return {
-        status: false,
-        message: {
-          password: "Incorrect Password"
-        }
-      }
+      throw new CustomError(HttpStatusEnum.UNAUTHORIZED, "Incorrect Password");
     }
 
-    const payload = { id: user._id, name: user.name }
-    const token = this.jwtService.generateToken(payload)
-    const refreshToken = this.jwtService.generateRefreshToken(payload)
+    const payload = { id: user._id, name: user.name };
+    const token = this.jwtService.generateToken(payload);
+    const refreshToken = this.jwtService.generateRefreshToken(payload);
+
     return {
       status: true,
-      message: "User Login Succesfully",
-      data: { token, refreshToken, user }
-    }
+      message: "User Login Successfully",
+      data: { token, refreshToken, user },
+    };
   }
-  
 }

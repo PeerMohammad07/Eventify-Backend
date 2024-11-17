@@ -1,10 +1,11 @@
 import express from "express"
 import dotenv from "dotenv"
-// import userRouter from "./infrastructure/routes/userRoutes";
+import userRouter from "./infrastructure/routes/userRoutes";
 import cors from "cors"
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import connectDB from "./infrastructure/config/db";
+import errorMiddleware from "./infrastructure/middlewares/errorHandlingMiddleware";
 
 const app = express();
 
@@ -19,7 +20,6 @@ app.use(cors({
   credentials: true,
 }));
 
-
 // Use morgan middleware to log HTTP requests
 app.use(morgan("dev"))
 
@@ -29,7 +29,10 @@ app.use(express.json());
 // Mongodb Connect
 connectDB()
 
-// app.use("/api/user",userRouter)
+app.use("/api/user",userRouter)
+
+// global error handling middlware
+app.use(errorMiddleware)
 
 const PORT = process.env.PORT || 3000
 
