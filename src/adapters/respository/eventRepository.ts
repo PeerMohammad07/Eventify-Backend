@@ -1,4 +1,4 @@
-import { Model, ObjectId } from "mongoose";
+import  { Model } from "mongoose";
 import IEvent from "../../interfaces/IEvent";
 import IEventRepository from "../../interfaces/IEventRepository";
 
@@ -12,7 +12,7 @@ class EventRepository implements IEventRepository {
   async createEvent(
     title: string,
     description: string,
-    date: Date,
+    date: string,
     location: string,
     userId: string
   ): Promise<IEvent | null> {
@@ -20,8 +20,18 @@ class EventRepository implements IEventRepository {
     return newEvent.save();
   }
 
-  async getAllEvents(userId: string): Promise<IEvent[]> {
-    return await this.event.find({ userId }).exec();
+  async getAllEvents( findData: any, skip: number, limit: number) {
+    try {
+      return await this.event.find(findData)  
+        .skip(skip)                         
+        .limit(limit);                        
+    } catch (error) {
+      throw new Error("Error fetching events");
+    }
+  }
+
+  async getCountAllEvents(query:any){
+    return await this.event.find(query).countDocuments()
   }
 
   async deleteEvent(userId: string, EventId: string) {
@@ -30,7 +40,7 @@ class EventRepository implements IEventRepository {
 
   async editEvent(title: string,
     description: string,
-    date: Date,
+    date: string,
     location: string,
     eventId: string,
     userId: string) {

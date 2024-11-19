@@ -5,7 +5,6 @@ class CustomError extends Error {
     super(message);
     this.statusCode = statusCode;
 
-    // Maintain proper stack trace (only on V8 engines like Node.js)
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, this.constructor);
     }

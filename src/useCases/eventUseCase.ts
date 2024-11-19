@@ -1,7 +1,8 @@
+import mongoose from "mongoose";
 import { HttpStatusEnum } from "../enums/statusCodeEnum";
 import CustomError from "../infrastructure/utils/customError";
 import IEventRepository from "../interfaces/IEventRepository";
-import IEventUseCase from "../interfaces/IEventUseCase";
+import IEventUseCase, { filter } from "../interfaces/IEventUseCase";
 import IUserRepository from "../interfaces/IUserRepository";
 
 export default class EventUseCase implements IEventUseCase {
@@ -13,7 +14,7 @@ export default class EventUseCase implements IEventUseCase {
     this.eventRepository = eventRepository
   }
 
-  async createEvent(title: string, description: string, date: Date, location: string, userId: string) {
+  async createEvent(title: string, description: string, date: string, location: string, userId: string) {
     if (!title || !description || !date || !location || !userId) {
       throw new CustomError(HttpStatusEnum.BAD_REQUEST, "All fields are required")
     }
@@ -25,20 +26,49 @@ export default class EventUseCase implements IEventUseCase {
 
     return {
       status: true,
-      message: "User created successfully",
+      message: "Event created successfully",
       data: response
     }
   }
 
-  async getAllEvents(userId: string) {
+  async getAllEvents(userId: string, query: string, filter: filter, page: number) {
     if (!userId) {
       throw new CustomError(HttpStatusEnum.BAD_REQUEST, "UserId is required");
     }
-    const response = await this.eventRepository.getAllEvents(userId)
+
+    let userObjectId;
+    try {
+      userObjectId = new mongoose.Types.ObjectId(userId);  
+    } catch (error) {
+      throw new CustomError(HttpStatusEnum.BAD_REQUEST, "Invalid UserId format");
+    }
+
+    let findData: any = { userId: userObjectId };
+
+    if (query && query !== "undefined") {  
+      findData.title = { $regex: query, $options: 'i' };  
+    }
+
+    if (filter?.startDate || filter?.endDate) {
+      if (filter.startDate) {
+        findData.date = { ...findData.date, $gte: filter.startDate}; 
+      }
+      if (filter.endDate) {
+        findData.date = { ...findData.date, $lte: new Date(filter.endDate) }; 
+      }
+    }
+
+    const pageSize = 6; 
+    const skip = (page - 1) * pageSize;
+
+    const totalEvents = await this.eventRepository.getCountAllEvents(findData)
+
+    const response = await this.eventRepository.getAllEvents(findData, skip, pageSize);
     return {
       status: true,
       message: "Got all events",
-      data: response
+      data: response,
+      totalEvents : totalEvents
     }
   }
 
@@ -57,14 +87,14 @@ export default class EventUseCase implements IEventUseCase {
 
   async editEvent(title: string,
     description: string,
-    date: Date,
+    date: string,
     location: string,
     eventId: string,
     userId: string) {
     if (!title || !description || !date || !location || !userId || !eventId) {
       throw new CustomError(HttpStatusEnum.BAD_REQUEST, "All fields are required")
     }
-    const response = await this.eventRepository.editEvent(title,description,date,location,eventId,userId)
+    const response = await this.eventRepository.editEvent(title, description, date, location, eventId, userId)
     return {
       status: true,
       message: "Event updated successfully",

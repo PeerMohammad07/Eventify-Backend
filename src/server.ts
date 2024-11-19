@@ -6,6 +6,7 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import connectDB from "./infrastructure/config/db";
 import errorMiddleware from "./infrastructure/middlewares/errorHandlingMiddleware";
+import CustomError from "./infrastructure/utils/customError";
 
 const app = express();
 

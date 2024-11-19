@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { HttpStatusEnum } from "../../enums/statusCodeEnum";
 import IUserUseCase from "../../interfaces/IUserUseCase";
 
-export default class UserController {
+export default class userController {
   private userUseCase: IUserUseCase;
 
   constructor(userUseCase: IUserUseCase) {
@@ -26,7 +26,8 @@ export default class UserController {
     try {
       const { name, email, password } = req.body;
       const response = await this.userUseCase.register({ name, email, password })
-
+      console.log(response);
+      
       this.setAuthCookies(res, response.data.token, response.data.refreshToken);
 
       res.status(HttpStatusEnum.OK).json({

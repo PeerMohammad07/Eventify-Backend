@@ -4,7 +4,7 @@ export default interface IEvent {
   _id? : string
   title: string;
   description: string;
-  date: Date;
+  date: string;
   location: string;
   userId: mongoose.Schema.Types.ObjectId; 
 }
