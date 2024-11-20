@@ -10,6 +10,7 @@ import EventUseCase from "../../useCases/eventUseCase"
 import Event from "../model/eventModel"
 import EventController from "../../adapters/controllers/eventController"
 import userController from "../../adapters/controllers/userController"
+import userAuth from "../middlewares/userAuth"
 // import userAuth from "../middlewares/userAuth"
 
 
@@ -32,10 +33,10 @@ userRouter.get("/test",(req,res)=>{
   res.send({message : "successfully hosted"})
 })
 
-userRouter.post('/event',eventController.createEvent)
-userRouter.patch('/event',eventController.editEvent)
-userRouter.delete('/event/:userId/:eventId',eventController.deleteEvent)
-userRouter.get('/event/:userId/search',eventController.getAllEvents)
+userRouter.post('/event',userAuth,eventController.createEvent)
+userRouter.patch('/event',userAuth,eventController.editEvent)
+userRouter.delete('/event/:userId/:eventId',userAuth,eventController.deleteEvent)
+userRouter.get('/event/:userId/search',userAuth,eventController.getAllEvents)
 
 userRouter.post('/register',UserController.register)
 userRouter.post('/login',UserController.login)

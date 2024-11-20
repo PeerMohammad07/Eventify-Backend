@@ -17,7 +17,7 @@ app.use(cookieParser())
 
 // Setting Cors 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://eventify-frontendd-peermohammad.vercel.app",
   credentials: true,
 }));
 

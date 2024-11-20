@@ -2,11 +2,11 @@
   "name": "eventify-backend",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "start": "node dist/server.js",
-    "dev": "nodemon src/server.ts",
-    "build": "tsc && cp -r public dist/"
-  },
+ "scripts": {
+  "start": "node dist/server.js",     
+  "dev": "nodemon src/server.ts",     
+  "build": "tsc && cp -r public dist/" 
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
