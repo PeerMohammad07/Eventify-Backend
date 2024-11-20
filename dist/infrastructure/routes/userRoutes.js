@@ -14,6 +14,7 @@ const eventUseCase_1 = __importDefault(require("../../useCases/eventUseCase"));
 const eventModel_1 = __importDefault(require("../model/eventModel"));
 const eventController_1 = __importDefault(require("../../adapters/controllers/eventController"));
 const userController_1 = __importDefault(require("../../adapters/controllers/userController"));
+const userAuth_1 = __importDefault(require("../middlewares/userAuth"));
 // import userAuth from "../middlewares/userAuth"
 const userRouter = express_1.default.Router();
 const HashingService = new hashingService_1.default();
@@ -27,10 +28,10 @@ const eventController = new eventController_1.default(eventUseCase);
 userRouter.get("/test", (req, res) => {
     res.send({ message: "successfully hosted" });
 });
-userRouter.post('/event', eventController.createEvent);
-userRouter.patch('/event', eventController.editEvent);
-userRouter.delete('/event/:userId/:eventId', eventController.deleteEvent);
-userRouter.get('/event/:userId/search', eventController.getAllEvents);
+userRouter.post('/event', userAuth_1.default, eventController.createEvent);
+userRouter.patch('/event', userAuth_1.default, eventController.editEvent);
+userRouter.delete('/event/:userId/:eventId', userAuth_1.default, eventController.deleteEvent);
+userRouter.get('/event/:userId/search', userAuth_1.default, eventController.getAllEvents);
 userRouter.post('/register', UserController.register);
 userRouter.post('/login', UserController.login);
 userRouter.post('/logout', UserController.logout);

@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
-    "build": "tsc"
+    "build": "tsc && cp -r public dist/"
   },
   "keywords": [],
   "author": "",
@@ -16,13 +16,20 @@
     "@types/bcrypt": "^5.0.2",
     "@types/dotenv": "^6.1.1",
     "@types/jsonwebtoken": "^9.0.7",
+    "@types/mongoose": "^5.11.96",
     "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
-    "lucide-react": "^0.460.0"
+    "lucide-react": "^0.460.0",
+    "mongoose": "^8.8.2",
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "@types/cookie-parser": "^1.4.7"
+    "@types/cookie-parser": "^1.4.7",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.9.1",
+    "typescript": "^5.6.3"
   }
 }
