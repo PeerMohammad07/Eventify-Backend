@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
-    "build": "tsc && cp -r public dist/"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -23,9 +23,6 @@
     "lucide-react": "^0.460.0"
   },
   "devDependencies": {
-    "@types/cookie-parser": "^1.4.7",
-    "@types/cors": "^2.8.17",
-    "@types/mongoose": "^5.11.96",
-    "@types/morgan": "^1.9.9"
+    "@types/cookie-parser": "^1.4.7"
   }
 }
